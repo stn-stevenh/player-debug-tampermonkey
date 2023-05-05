@@ -2,10 +2,11 @@
 // @name         STN Player Debug Buttons
 // @namespace    stnplayerdebugbutton
 // @description  Debug Buttons for STN Player
-// @version      7
+// @version      8
 // @match        *://*/*
 // @grant        none
 // @updateURL    https://stevendev.sendtonews.com/player-debug-tampermonkey/player-debug.user.js
+// @downloadURL  https://stevendev.sendtonews.com/player-debug-tampermonkey/player-debug.user.js
 // ==/UserScript==
 
 (
