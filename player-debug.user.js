@@ -2,12 +2,22 @@
 // @name         STN Player Debug Buttons
 // @namespace    stnplayerdebugbutton
 // @description  Debug Buttons for STN Player
+// @Author       Steven Hall
 // @version      8
 // @match        *://*/*
 // @grant        none
 // @updateURL    https://stevendev.sendtonews.com/player-debug-tampermonkey/player-debug.user.js
 // @downloadURL  https://stevendev.sendtonews.com/player-debug-tampermonkey/player-debug.user.js
 // ==/UserScript==
+
+// TODO:
+// - Move this script to github... Distribution cannot use it when it is hosted on my dev server
+//    - Set mine up to use the dev branch
+// - "Stacking Context" is confusing... What is it?
+//    - What problems can a stacking context cause?
+//    - Maybe just combine the stacking context into the common player issues script
+// - Provide instruction for HOW to fix the problem, not just identify what the problem is.
+// - Check for non floating reason button - Needs to have STN Debug enabled
 
 (
     function()
