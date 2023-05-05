@@ -6,8 +6,8 @@
 // @version      8
 // @match        *://*/*
 // @grant        none
-// @updateURL    https://stevendev.sendtonews.com/player-debug-tampermonkey/player-debug.user.js
-// @downloadURL  https://stevendev.sendtonews.com/player-debug-tampermonkey/player-debug.user.js
+// @updateURL    https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@master/player-debug.user.js
+// @downloadURL  https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@master/player-debug.user.js
 // ==/UserScript==
 
 // TODO:
@@ -24,11 +24,20 @@
     {
         'use strict';
 
+        const searchParams = new URLSearchParams(location.search);
+        const isDev        = searchParams.get('stnDev') === '1';
+        const isDebug      = searchParams.get('stnDebug') === '1';
+        const branch       = isDev ? 'development' : 'master';
+
+        const devModeTitle   = `${isDev ? 'Disable' : 'Enable'} Dev Mode`;
+        const debugModeTitle = `${isDebug ? 'Disable' : 'Enable'} Player Debug`;
+
         const scriptSources = {
-            'Check Stacking Context':     'https://stevendev.sendtonews.com/bookmarklets/player-stacking-context.js',
-            'Check Common Player Issues': 'https://stevendev.sendtonews.com/bookmarklets/player-debug.js',
-            'Scroll To Next Player':      'https://stevendev.sendtonews.com/bookmarklets/scroll-to-next-player.js',
-            'Toggle Player Debug':        'https://stevendev.sendtonews.com/bookmarklets/toggle-player-debug.js',
+            'Check Stacking Context':     `https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@${branch}/scripts/player-stacking-context.js`,
+            'Check Common Player Issues': `https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@${branch}/scripts/player-debug.js`,
+            'Scroll To Next Player':      `https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@${branch}/scripts/scroll-to-next-player.js`,
+            [debugModeTitle]:             `https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@${branch}/scripts/toggle-player-debug.js`,
+            [devModeTitle]:               `https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@${branch}/scripts/toggle-dev-mode.js`,
         };
         const numberOfButtons = Object.keys(scriptSources).length;
 
@@ -41,8 +50,9 @@
         container.style.zIndex = '2147483647';
         container.style.display = 'none';
         container.style.padding = '10px';
-        container.style.background = '#045473';
+        container.style.background = isDev ? 'tomato' : '#045473';
         container.style.boxShadow = 'grey 5px 5px 10px 0px';
+        container.style.fontFamily = 'monospace';
 
         container.style.cursor = 'grab';
 
@@ -51,6 +61,7 @@
         title.style.textAlign = 'center';
         title.style.margin = '7px 0px 17px 0px';
         title.textContent = "STN Player Debugger";
+        title.style.fontFamily = 'monospace';
 
         container.appendChild(title);
 
@@ -70,6 +81,8 @@
 
                 myButton.style.padding = '10px';
                 myButton.style.cursor = 'pointer';
+                myButton.style.background = 'white';
+                myButton.style.fontFamily = 'monospace';
 
                 myButton.addEventListener
                 (

@@ -1,4 +1,8 @@
 javascript:(async function() {
+	const searchParams = new URLSearchParams(location.search);
+	const isDev        = searchParams.has('stnDev');
+	const branch       = isDev ? 'development' : 'master';
+
 	const findIssues = function ( node, issues = [] )
 	{
 		/* the root element (HTML). */
@@ -24,7 +28,7 @@ javascript:(async function() {
 		return findIssues( node.parentNode, issues );
 	};
 
-	const sharedFunctions = await import('https://stevendev.sendtonews.com/bookmarklets/sharedFunctions.js');
+	const sharedFunctions = await import(`https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@${branch}/scripts/sharedFunctions.js`);
 	const msg = sharedFunctions.runner('Check Common Player Issues', findIssues);
 
 	if (msg)

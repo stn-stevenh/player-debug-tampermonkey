@@ -57,8 +57,8 @@ function objectToUrlQuery(obj)
 
 function log(data)
 {
-    const url = `https://stevendev.sendtonews.com/debug-tool.php?${objectToUrlQuery(data)}`;
-    navigator.sendBeacon(url);
+    // const url = `https://stevendev.sendtonews.com/debug-tool.php?${objectToUrlQuery(data)}`;
+    // navigator.sendBeacon(url);
 }
 
 
