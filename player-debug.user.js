@@ -3,7 +3,7 @@
 // @namespace    stnplayerdebugbutton
 // @description  Debug Buttons for STN Player
 // @Author       Steven Hall
-// @version      8
+// @version      9
 // @match        *://*/*
 // @grant        none
 // @updateURL    https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@master/player-debug.user.js
@@ -33,48 +33,22 @@
         const numberOfButtons = Object.keys(buttonFuncs).length;
 
         const container = document.createElement('div');
-
-        // Add some styles to make the button fixed position and always visible
-        container.style.position = 'fixed';
-        container.style.bottom = '20px';
-        container.style.right = '20px';
-        container.style.zIndex = '2147483647';
-        container.style.display = 'none';
-        container.style.padding = '10px';
-        container.style.background = '#045473';
-        container.style.border = '3px solid rgb(0 145 201)';
-        container.style.boxShadow = 'grey 5px 5px 10px 0px';
-        container.style.fontFamily = 'monospace';
-
-        container.style.cursor = 'grab';
+        container.setAttribute('id', 'stn-debugger-container');
 
         const title = document.createElement('h3');
-        title.style.color = 'white';
-        title.style.textAlign = 'center';
-        title.style.margin = '7px 0px 17px 0px';
+        title.setAttribute('id', 'stn-debugger-title');
         title.textContent = "STN Player Debugger";
-        title.style.fontFamily = 'monospace';
-
         container.appendChild(title);
 
+        const buttons = [];
         Object.entries(buttonFuncs).forEach
         (
             ([ name, func ], idx) =>
             {
                 // Create a button element
                 const myButton = document.createElement('button');
+                myButton.classList.add('stn-debugger-button');
                 myButton.innerText = name;
-
-                // No margin on the last button
-                if (idx < numberOfButtons - 1)
-                {
-                    myButton.style.marginBottom = '10px';
-                }
-
-                myButton.style.padding = '10px';
-                myButton.style.cursor = 'pointer';
-                myButton.style.background = 'white';
-                myButton.style.fontFamily = 'monospace';
 
                 myButton.addEventListener
                 (
@@ -87,6 +61,7 @@
 
                 // Add the button to the page
                 container.appendChild(myButton);
+                buttons.push(myButton);
             }
         );
 
@@ -97,81 +72,58 @@
         container.addEventListener("mousedown", mouseDown, {passive: false});
         container.addEventListener("touchstart", touchStart, {passive: false});
 
-        function mouseDown(event)
-        {
-            event.preventDefault();
-
-            // calculate the initial mouse position relative to the container
-            xPos = container.offsetWidth - (event.clientX - container.getBoundingClientRect().left);
-            yPos = container.offsetHeight - (event.clientY - container.getBoundingClientRect().top);
-
-            // add event listeners for dragging and releasing the container
-            document.addEventListener("mousemove", mouseMove, {passive: false});
-            document.addEventListener("mouseup", mouseUp, {passive: false});
-
-            container.style.cursor = 'grabbing';
-        }
-
-        function touchStart(event)
-        {
-            event.preventDefault();
-
-            // calculate the initial touch position relative to the container
-            xPos = container.offsetWidth - (event.touches[0].clientX - container.getBoundingClientRect().left);
-            yPos = container.offsetHeight - (event.touches[0].clientY - container.getBoundingClientRect().top);
-
-            // add event listeners for dragging and releasing the container
-            document.addEventListener("touchmove", touchMove, {passive: false});
-            document.addEventListener("touchend", touchEnd, {passive: false});
-
-            container.style.cursor = 'grabbing';
-        }
-
-        function mouseMove(event)
-        {
-            event.preventDefault();
-
-            // calculate the new position of the container based on the mouse position
-            const newXPos = event.clientX - (container.offsetWidth - xPos);
-            const newYPos = event.clientY - (container.offsetHeight - yPos);
-
-            // set the container's position to the new position
-            container.style.right = window.innerWidth - newXPos - container.offsetWidth + "px";
-            container.style.bottom = window.innerHeight - newYPos - container.offsetHeight + "px";
-        }
-
-        function touchMove(event)
-        {
-            event.preventDefault();
-
-            // calculate the new position of the container based on the touch position
-            const newXPos = event.touches[0].clientX - (container.offsetWidth - xPos);
-            const newYPos = event.touches[0].clientY - (container.offsetHeight - yPos);
-
-            // set the container's position to the new position
-            container.style.right = window.innerWidth - newXPos - container.offsetWidth + "px";
-            container.style.bottom = window.innerHeight - newYPos - container.offsetHeight + "px";
-        }
-
-        function mouseUp(event)
-        {
-            // remove the event listeners for dragging and releasing the container
-            document.removeEventListener("mousemove", mouseMove, {passive: false});
-            document.removeEventListener("mouseup", mouseUp, {passive: false});
-
-            container.style.cursor = 'grab';
-        }
-
-        function touchEnd(event)
-        {
-            // remove the event listeners for dragging and releasing the container
-            document.removeEventListener("touchmove", touchMove, {passive: false});
-            document.removeEventListener("touchend", touchEnd, {passive: false});
-
-            container.style.cursor = 'grab';
-        }
-
         document.body.appendChild(container);
+
+        setDefaultCSS
+        (
+            container,
+            {
+                'position':    'fixed',
+                'bottom':      '20px',
+                'right':       '20px',
+                'cursor':      'grab',
+                'display':     'none',
+                'z-index':     '2147483647',
+                'padding':     '10px',
+                'background':  '#045473',
+                'border':      '3px solid rgb(0 145 201)',
+                'box-shadow':  'grey 5px 5px 10px 0px',
+                'font-family': 'monospace',
+            }
+        );
+
+        setDefaultCSS
+        (
+            title,
+            {
+                'color':       'white',
+                'text-align':  'center',
+                'margin':      '7px 0px 17px 0px',
+                'font-family': 'monospace',
+            }
+        );
+
+        buttons.forEach
+        (
+            (button, idx) =>
+            {
+                const styles = {
+                    'padding':     '10px',
+                    'cursor':      'pointer',
+                    'background':  'white',
+                    'font-family': 'monospace',
+                    'color':       'black',
+                };
+
+                // No margin on the last button
+                if (idx < numberOfButtons - 1)
+                {
+                    styles['margin-bottom'] = '10px';
+                }
+
+                setDefaultCSS(button, styles);
+            }
+        );
 
         // Create a MutationObserver to watch for changes to the page
         let haveCreatedModal = false;
@@ -184,7 +136,7 @@
                 const shouldShowButton = stnPlayers.length > 0;
 
                 // Show or hide the button based on whether there are any stn-player elements
-                container.style.display = shouldShowButton ? 'grid' : 'none';
+                container.style.setProperty('display', shouldShowButton ? 'grid' : 'none', 'important');
 
                 if (shouldShowButton && !haveCreatedModal)
                 {
@@ -214,6 +166,35 @@
 
             document.body.removeChild(ele);
             return value;
+        };
+
+        function setDefaultCSS(node, overrides = {}, ignore = [])
+        {
+            const humanReadable = generateSelector(node);
+
+            // Create a new stylesheet
+            const style = document.createElement('style');
+            style.classList.add('stn-modal-styles');
+            document.head.appendChild(style);
+
+            // Add a CSS rule to reset all styles for the element
+            const rules = [
+                `${humanReadable}:not(#dummy1):not(#dummy2):not(#dummy3)`,
+                '{',
+                '    all: revert !important;',
+                '}',
+            ];
+
+            Object.entries(overrides).forEach
+            (
+                ([ styleName, value ]) =>
+                {
+                    node.style.setProperty(styleName, value, 'important');
+                    // rules.push(`    ${styleName}: ${value} !important;`);
+                }
+            );
+
+            style.textContent = rules.join('\n');
         };
 
         let fixes = {};
@@ -405,6 +386,7 @@
                 ];
 
                 modalContent(content.join("<br>"));
+                hideStyleButtons();
                 console.warn(content.join("\n"));
                 showModal();
                 return;
@@ -448,20 +430,21 @@
                 }
             );
 
-            fixCSS.push("<pre style='max-height: 250px; overflow: auto; padding: 10px; border: 1px solid white; margin-bottom: 20px'>");
+            fixCSS.push("<pre id='stn-fix-code-modal' style='max-height: 250px !important; overflow: auto !important; padding: 10px !important; border: 1px solid white !important; margin-bottom: 20px !important'>");
 
             Object.entries(fixes).forEach
             (
                 ([ humanNode, css ]) =>
                 {
-                    fixCSS.push(humanNode);
+                    fixCSS.push(`${humanNode}:not(#stnPriority1):not(#stnPriority2):not(#stnPriority3)`);
                     fixCSS.push('{');
 
                     Object.entries(css).forEach
                     (
                         ([ propName, value ]) =>
                         {
-                            fixCSS.push(`    ${propName}: ${value};`);
+                            // fixCSS.push(`    ${propName}: ${value} !important;`);
+                            fixCSS.push(`    ${propName}: revert !important;`);
                         }
                     );
 
@@ -486,16 +469,24 @@
                         fixCSS.join("\n"),
                     ];
                     console.warn("Player issues found  👎:\n\n" + msg.join("\n"));
+                    showStyleButtons();
                 }
                 else
                 {
                     content = [
                         "Could not find any player issues on page. 👍",
                     ];
+                    hideStyleButtons();
                 }
 
                 modalContent(content.join("<br>"));
                 showModal();
+
+                setDefaultCSS
+                (
+                    document.querySelector('#stn-fix-code-modal'),
+                    {}
+                );
             }
         }
 
@@ -595,18 +586,44 @@
         }
 
 
-        function generateSelector( element )
+        function generateSelector( node, selector = '' )
         {
-            let selector, tag = element.nodeName.toLowerCase();
-            if ( element.id )
+            if (!node)
             {
-                selector = '#' + element.getAttribute( 'id' );
+                return selector;
             }
-            else if ( element.getAttribute( 'class' ) )
+
+            let tag = node.nodeName.toLowerCase();
+            if (tag === 'html')
             {
-                selector = '.' + element.getAttribute( 'class' ).split( ' ' ).join( '.' );
+                return selector;
             }
-            return selector ? tag + selector : tag;
+            else if (tag === '#document-fragment')
+            {
+                return generateSelector(node.host, selector);
+            }
+
+
+            let newSelector = '';
+            if ( node.id )
+            {
+                newSelector = '#' + node.getAttribute( 'id' );
+            }
+            else if ( node.getAttribute( 'class' ) )
+            {
+                newSelector = '.' + node.getAttribute( 'class' ).split( ' ' ).join( '.' );
+            }
+
+            newSelector = newSelector ? tag + newSelector : tag;
+
+            if (selector)
+            {
+                return generateSelector(node.parentNode, `${newSelector} > ${selector}`)
+            }
+            else
+            {
+                return generateSelector(node.parentNode, `${newSelector}`)
+            }
         }
 
         function toggleSearchParam(param)
@@ -632,29 +649,13 @@
             // Create modal elements
             const modalContainer = document.createElement('div');
             modalContainer.setAttribute('id', 'modal-container');
-            modalContainer.style.background = '#045473';
-            modalContainer.style.position = 'fixed';
-            modalContainer.style.top = '50%';
-            modalContainer.style.left = '50%';
-            modalContainer.style.transform = 'translate(-50%, -50%)';
-            modalContainer.style.zIndex = '99999999999999';
-            modalContainer.style.padding = '20px';
-            modalContainer.style.border = '3px solid rgb(0 145 201)';
-            modalContainer.style.minWidth = '350px';
-            modalContainer.style.maxWidth = '500px';
-            modalContainer.style.width = '90vw';
-            modalContainer.style.minHeight = '300px';
-            modalContainer.style.maxHeight = '70vh';
-            modalContainer.style.height = 'fit-content';
-            modalContainer.style.overflow = 'auto';
-            modalContainer.style.display = 'none';
-
 
             const modalContent = document.createElement('div');
             modalContent.setAttribute('id', 'modal-content');
 
             const modalTitle = document.createElement('h2');
             modalTitle.innerText = 'Player Debug Info';
+            modalTitle.setAttribute('id', 'stnModalTitle');
             modalContent.appendChild(modalTitle);
 
             const modalText = document.createElement('div');
@@ -662,16 +663,134 @@
             modalContent.appendChild(modalText);
 
             const closeModalButton = document.createElement('button');
-            closeModalButton.setAttribute('id', 'close-modal');
             closeModalButton.innerText = 'Close';
-            closeModalButton.style.background = 'white';
-            closeModalButton.style.padding = '7px';
+            closeModalButton.setAttribute('id', 'close-modal');
             modalContent.appendChild(closeModalButton);
+
+            const copyButton = document.createElement('button');
+            copyButton.innerText = 'Copy Styles';
+            copyButton.setAttribute('id', 'copy-modal');
+            modalContent.appendChild(copyButton);
+
+            const applyButton = document.createElement('button');
+            applyButton.innerText = 'Apply Styles to Page';
+            applyButton.setAttribute('id', 'apply-modal');
+            modalContent.appendChild(applyButton);
 
             modalContainer.appendChild(modalContent);
             document.body.appendChild(modalContainer);
 
+            setDefaultCSS
+            (
+                modalContainer,
+                {
+                    'background': '#045473',
+                    'font-family': 'monospace',
+                    'position':   'fixed',
+                    'top':        '50%',
+                    'display':    'none',
+                    'left':       '50%',
+                    'transform':  'translate(-50%, -50%)',
+                    'z-index':    '99999999999999',
+                    'padding':    '20px',
+                    'border':     '3px solid rgb(0 145 201)',
+                    'min-width':  '350px',
+                    'max-width':  '500px',
+                    'width':      '90vw',
+                    // 'min-height': '300px',
+                    'max-height': '70vh',
+                    'height':     'fit-content',
+                    'overflow':   'auto',
+                    'color':      'white',
+                },
+            );
+
+            setDefaultCSS
+            (
+                modalContent,
+                {
+                }
+            );
+
+            setDefaultCSS
+            (
+                modalTitle,
+                {
+                    'color': 'white',
+                    'margin-top': '0px',
+                }
+            );
+
+            setDefaultCSS
+            (
+                modalText,
+                {
+                    'margin-bottom': '17px',
+                }
+            );
+
+            setDefaultCSS
+            (
+                closeModalButton,
+                {
+                    'background': 'white',
+                    'padding':    '7px',
+                    'cursor':     'pointer',
+                    'color':      'black',
+                }
+            );
+
+            setDefaultCSS
+            (
+                copyButton,
+                {
+                    'background': 'white',
+                    'padding': '7px',
+                    'margin-left': '5px',
+                    'cursor': 'pointer',
+                    'color':      'black',
+                }
+            );
+
+            setDefaultCSS
+            (
+                applyButton,
+                {
+                    'background': 'white',
+                    'padding': '7px',
+                    'margin-left': '5px',
+                    'cursor': 'pointer',
+                    'color':      'black',
+                }
+            );
+
             closeModalButton.addEventListener('click', hideModal);
+
+            applyButton.addEventListener
+            (
+                'click',
+                () =>
+                {
+                    const styleCode = modalText.querySelector('pre').textContent;
+                    const styleEl = document.createElement('style');
+                    styleEl.classList.add('stn-fix-styles');
+
+                    styleEl.textContent = styleCode;
+
+                    document.head.appendChild(styleEl);
+                    playerIssues();
+                    console.log(styleEl);
+                }
+            );
+            copyButton.addEventListener
+            (
+                'click',
+                () =>
+                {
+                    const styleCode = modalText.querySelector('pre');
+                    copyTextToClipboard(styleCode);
+                }
+            );
         }
 
         function modalContent(content)
@@ -683,13 +802,123 @@
         function showModal()
         {
             const modalContainer = document.querySelector('#modal-container');
-            modalContainer.style.display = 'block';
+            modalContainer.style.setProperty('display', 'block', 'important');
         }
 
         function hideModal()
         {
             const modalContainer = document.querySelector('#modal-container');
-            modalContainer.style.display = 'none';
+            modalContainer.style.setProperty('display', 'none', 'important');
+        }
+
+        function mouseDown(event)
+        {
+            event.preventDefault();
+
+            // calculate the initial mouse position relative to the container
+            xPos = container.offsetWidth - (event.clientX - container.getBoundingClientRect().left);
+            yPos = container.offsetHeight - (event.clientY - container.getBoundingClientRect().top);
+
+            // add event listeners for dragging and releasing the container
+            document.addEventListener("mousemove", mouseMove, {passive: false});
+            document.addEventListener("mouseup", mouseUp, {passive: false});
+
+            container.style.setProperty('cursor', 'grabbing', 'important');
+        }
+
+        function touchStart(event)
+        {
+            event.preventDefault();
+
+            // calculate the initial touch position relative to the container
+            xPos = container.offsetWidth - (event.touches[0].clientX - container.getBoundingClientRect().left);
+            yPos = container.offsetHeight - (event.touches[0].clientY - container.getBoundingClientRect().top);
+
+            // add event listeners for dragging and releasing the container
+            document.addEventListener("touchmove", touchMove, {passive: false});
+            document.addEventListener("touchend", touchEnd, {passive: false});
+
+            container.style.setProperty('cursor', 'grabbing', 'important');
+        }
+
+        function mouseMove(event)
+        {
+            event.preventDefault();
+
+            // calculate the new position of the container based on the mouse position
+            const newXPos = event.clientX - (container.offsetWidth - xPos);
+            const newYPos = event.clientY - (container.offsetHeight - yPos);
+
+            // set the container's position to the new position
+            container.style.setProperty('right', window.innerWidth - newXPos - container.offsetWidth + "px", 'important');
+            container.style.setProperty('bottom', window.innerHeight - newYPos - container.offsetHeight + "px", 'important');
+        }
+
+        function touchMove(event)
+        {
+            event.preventDefault();
+
+            // calculate the new position of the container based on the touch position
+            const newXPos = event.touches[0].clientX - (container.offsetWidth - xPos);
+            const newYPos = event.touches[0].clientY - (container.offsetHeight - yPos);
+
+            // set the container's position to the new position
+            container.style.right = window.innerWidth - newXPos - container.offsetWidth + "px";
+            container.style.bottom = window.innerHeight - newYPos - container.offsetHeight + "px";
+        }
+
+        function mouseUp(event)
+        {
+            // remove the event listeners for dragging and releasing the container
+            document.removeEventListener("mousemove", mouseMove, {passive: false});
+            document.removeEventListener("mouseup", mouseUp, {passive: false});
+
+            container.style.setProperty('cursor', 'grab', 'important');
+        }
+
+        function touchEnd(event)
+        {
+            // remove the event listeners for dragging and releasing the container
+            document.removeEventListener("touchmove", touchMove, {passive: false});
+            document.removeEventListener("touchend", touchEnd, {passive: false});
+
+            container.style.setProperty('cursor', 'grab', 'important');
+        }
+
+        function hideStyleButtons()
+        {
+            const copy = document.querySelector('#copy-modal');
+            const apply = document.querySelector('#apply-modal');
+
+            copy.style.setProperty('display', 'none', 'important');
+            apply.style.setProperty('display', 'none', 'important');
+        }
+
+        function showStyleButtons()
+        {
+            const copy = document.querySelector('#copy-modal');
+            const apply = document.querySelector('#apply-modal');
+
+            copy.style.setProperty('display', 'inline-block', 'important');
+            apply.style.setProperty('display', 'inline-block', 'important');
+        }
+
+        function copyTextToClipboard(element)
+        {
+            // Get the text from the element
+            const text = element.innerText;
+
+            // Create a temporary textarea element to hold the text
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+
+            // Select the text and copy it to the clipboard
+            textarea.select();
+            document.execCommand('copy');
+
+            // Remove the temporary textarea element
+            document.body.removeChild(textarea);
         }
     }
 )();
