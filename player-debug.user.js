@@ -3,7 +3,7 @@
 // @namespace    stnplayerdebugbutton
 // @description  Debug Buttons for STN Player
 // @Author       Steven Hall
-// @version      9
+// @version      10
 // @match        *://*/*
 // @grant        none
 // @updateURL    https://cdn.jsdelivr.net/gh/stn-stevenh/player-debug-tampermonkey@master/player-debug.user.js
@@ -170,6 +170,11 @@
 
         function setDefaultCSS(node, overrides = {}, ignore = [])
         {
+            if (!node)
+            {
+                return;
+            }
+
             const humanReadable = generateSelector(node);
 
             // Create a new stylesheet
@@ -648,10 +653,10 @@
         {
             // Create modal elements
             const modalContainer = document.createElement('div');
-            modalContainer.setAttribute('id', 'modal-container');
+            modalContainer.setAttribute('id', 'stn-modal-container');
 
             const modalContent = document.createElement('div');
-            modalContent.setAttribute('id', 'modal-content');
+            modalContent.setAttribute('id', 'stn-modal-content');
 
             const modalTitle = document.createElement('h2');
             modalTitle.innerText = 'Player Debug Info';
@@ -659,22 +664,22 @@
             modalContent.appendChild(modalTitle);
 
             const modalText = document.createElement('div');
-            modalText.setAttribute('id', 'modal-text')
+            modalText.setAttribute('id', 'stn-modal-text')
             modalContent.appendChild(modalText);
 
             const closeModalButton = document.createElement('button');
             closeModalButton.innerText = 'Close';
-            closeModalButton.setAttribute('id', 'close-modal');
+            closeModalButton.setAttribute('id', 'stn-close-modal');
             modalContent.appendChild(closeModalButton);
 
             const copyButton = document.createElement('button');
             copyButton.innerText = 'Copy Styles';
-            copyButton.setAttribute('id', 'copy-modal');
+            copyButton.setAttribute('id', 'stn-copy-modal');
             modalContent.appendChild(copyButton);
 
             const applyButton = document.createElement('button');
             applyButton.innerText = 'Apply Styles to Page';
-            applyButton.setAttribute('id', 'apply-modal');
+            applyButton.setAttribute('id', 'stn-apply-modal');
             modalContent.appendChild(applyButton);
 
             modalContainer.appendChild(modalContent);
@@ -795,19 +800,19 @@
 
         function modalContent(content)
         {
-            const modalText = document.querySelector('#modal-text');
+            const modalText = document.querySelector('#stn-modal-text');
             modalText.innerHTML = content;
         }
 
         function showModal()
         {
-            const modalContainer = document.querySelector('#modal-container');
+            const modalContainer = document.querySelector('#stn-modal-container');
             modalContainer.style.setProperty('display', 'block', 'important');
         }
 
         function hideModal()
         {
-            const modalContainer = document.querySelector('#modal-container');
+            const modalContainer = document.querySelector('#stn-modal-container');
             modalContainer.style.setProperty('display', 'none', 'important');
         }
 
@@ -887,8 +892,8 @@
 
         function hideStyleButtons()
         {
-            const copy = document.querySelector('#copy-modal');
-            const apply = document.querySelector('#apply-modal');
+            const copy = document.querySelector('#stn-copy-modal');
+            const apply = document.querySelector('#stn-apply-modal');
 
             copy.style.setProperty('display', 'none', 'important');
             apply.style.setProperty('display', 'none', 'important');
@@ -896,8 +901,8 @@
 
         function showStyleButtons()
         {
-            const copy = document.querySelector('#copy-modal');
-            const apply = document.querySelector('#apply-modal');
+            const copy = document.querySelector('#stn-copy-modal');
+            const apply = document.querySelector('#stn-apply-modal');
 
             copy.style.setProperty('display', 'inline-block', 'important');
             apply.style.setProperty('display', 'inline-block', 'important');
